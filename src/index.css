@@ -1,0 +1,128 @@
+body {
+  margin: 0;
+  background: #0b1220;
+  color: white;
+  font-family: Arial;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+}
+
+input {
+  padding: 10px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 8px 12px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.finish {
+  background: green;
+  color: white;
+}
+
+.card {
+  margin-top: 20px;
+  padding: 20px;
+  background: #111a2e;
+  border-radius: 10px;
+  animation: fade 0.4s ease-in-out;
+}
+
+.formula {
+  margin: 10px 0;
+  color: #ffffff;
+  font-style: italic;
+  background: #1f2a44;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.matrix {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+  margin: 2px;
+  border: 1px solid #444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cipher {
+  margin-top: 20px;
+  padding: 15px;
+  background: #1a2b1a;
+  border-radius: 10px;
+  text-align: center;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* 🔥 плавная смена шага */
+.step-animate {
+  animation: fadeSlide 0.35s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+.btns {
+  margin-top: 15px;
+}
+
+button {
+  padding: 8px 14px;
+  margin: 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background: #1f2a44;
+  color: white;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #2d3f66;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.finish {
+  background: green;
+}
