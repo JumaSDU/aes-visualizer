@@ -14,7 +14,7 @@ export default function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    api.dashboard().then(setData);
+    api.dashboard().then(setData).catch(console.error);
   }, []);
 
   return (
