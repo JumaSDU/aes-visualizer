@@ -15,7 +15,7 @@ const paths = {
   chev: <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />,
 };
 
-export default function Icon({ name, size = 18, color = "currentColor", style }) {
+export default function Icon({ name, size = 18, color = "currentColor", style, className }) {
   const node = paths[name];
   if (!node) return null;
   return (
@@ -24,6 +24,7 @@ export default function Icon({ name, size = 18, color = "currentColor", style })
       viewBox="0 0 24 24"
       fill={name === "chev" ? "none" : color}
       style={style}
+      className={className}
       aria-hidden="true"
     >
       {node}

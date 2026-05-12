@@ -1,5 +1,5 @@
-const SBOX=[99,124,119,123,242,107,111,197,48,1,103,43,254,215,171,118,202,130,201,125,250,89,71,240,173,212,162,175,156,164,114,192,183,253,147,38,54,63,247,204,52,165,229,241,113,216,49,21,4,199,35,195,24,150,5,154,7,18,128,226,235,39,178,117,9,131,44,26,27,110,90,160,82,59,214,179,41,227,47,132,83,209,0,237,32,252,177,91,106,203,190,57,74,76,88,207,208,239,170,251,67,77,51,133,69,249,2,127,80,60,159,168,81,163,64,143,146,157,56,245,188,182,218,33,16,255,243,210,205,12,19,236,95,151,68,23,196,167,126,61,100,93,25,115,96,129,79,220,34,42,144,136,70,238,184,20,222,94,11,219,224,50,58,10,73,6,36,92,194,211,172,98,145,149,228,121,231,200,55,109,141,213,78,169,108,86,244,234,101,122,174,8,186,120,37,46,28,166,180,198,232,221,116,31,75,189,139,138,112,62,181,102,72,3,246,14,97,53,87,185,134,193,29,158,225,248,152,17,105,217,142,148,155,30,135,233,206,85,40,223,140,161,137,13,191,230,66,104,65,153,45,15,176,84,187,22];
-const INV_SBOX=new Array(256).fill(0);
+export const SBOX=[99,124,119,123,242,107,111,197,48,1,103,43,254,215,171,118,202,130,201,125,250,89,71,240,173,212,162,175,156,164,114,192,183,253,147,38,54,63,247,204,52,165,229,241,113,216,49,21,4,199,35,195,24,150,5,154,7,18,128,226,235,39,178,117,9,131,44,26,27,110,90,160,82,59,214,179,41,227,47,132,83,209,0,237,32,252,177,91,106,203,190,57,74,76,88,207,208,239,170,251,67,77,51,133,69,249,2,127,80,60,159,168,81,163,64,143,146,157,56,245,188,182,218,33,16,255,243,210,205,12,19,236,95,151,68,23,196,167,126,61,100,93,25,115,96,129,79,220,34,42,144,136,70,238,184,20,222,94,11,219,224,50,58,10,73,6,36,92,194,211,172,98,145,149,228,121,231,200,55,109,141,213,78,169,108,86,244,234,101,122,174,8,186,120,37,46,28,166,180,198,232,221,116,31,75,189,139,138,112,62,181,102,72,3,246,14,97,53,87,185,134,193,29,158,225,248,152,17,105,217,142,148,155,30,135,233,206,85,40,223,140,161,137,13,191,230,66,104,65,153,45,15,176,84,187,22];
+export const INV_SBOX=new Array(256).fill(0);
 SBOX.forEach((v,i)=>{INV_SBOX[v]=i});
 const MIX=[[2,3,1,1],[1,2,3,1],[1,1,2,3],[3,1,1,2]];
 const INV_MIX=[[14,11,13,9],[9,14,11,13],[13,9,14,11],[11,13,9,14]];
@@ -10,7 +10,7 @@ function strToBytes(s){const b=[];for(let i=0;i<16;i++)b.push(i<s.length?s.charC
 function hexToBytes(h){h=h.replace(/\s/g,'');const b=[];for(let i=0;i<h.length;i+=2)b.push(parseInt(h.substr(i,2),16));while(b.length<16)b.push(0);return b.slice(0,16)}
 function bytesToMatrix(b){const m=[];for(let c=0;c<4;c++)m.push([b[c*4],b[c*4+1],b[c*4+2],b[c*4+3]]);return m}
 function matrixToBytes(m){const b=[];for(let c=0;c<4;c++)for(let r=0;r<4;r++)b.push(m[c][r]);return b}
-function snap(m){return matrixToBytes(m).map(b=>b.toString(16).padStart(2,'0').toUpperCase())}
+function snap(m){const a=[];for(let r=0;r<4;r++)for(let c=0;c<4;c++)a.push(m[c][r].toString(16).padStart(2,'0').toUpperCase());return a}
 
 function subBytes(s){return s.map(r=>r.map(b=>SBOX[b]))}
 function invSubBytes(s){return s.map(r=>r.map(b=>INV_SBOX[b]))}
@@ -48,9 +48,10 @@ export function encryptSteps(text, key) {
 
   steps.push({ name:"Input", state: snap(s), formula:"P → 4×4 matrix", desc:"Plaintext placed into a 4×4 byte matrix (column-major order)." });
 
-  let rk = bytesToMatrix(rks[0]);
-  s = s.map((col,c)=>col.map((b,r)=>b^rk[c][r]));
-  steps.push({ name:"AddRoundKey", state: snap(s), formula:"P ⊕ K₀", desc:"XOR every byte with the initial round key. Hides plaintext patterns before the main rounds." });
+  const rk0 = bytesToMatrix(rks[0]);
+  const p0 = snap(s);
+  s = s.map((col,c)=>col.map((b,r)=>b^rk0[c][r]));
+  steps.push({ name:"AddRoundKey", state: snap(s), prev: p0, formula:"P ⊕ K₀", desc:"XOR every byte with the initial round key. Hides plaintext patterns before the main rounds." });
 
   for(let round=1;round<=10;round++){
     const p1=snap(s); s=subBytes(s);
@@ -64,7 +65,7 @@ export function encryptSteps(text, key) {
       steps.push({ name:`MixColumns (R${round})`, state: snap(s), prev: p3, formula:"GF(2⁸) multiply", desc:"Each column multiplied by a polynomial matrix in GF(2⁸). Every output byte depends on all 4 input bytes." });
     }
 
-    rk=bytesToMatrix(rks[round]);
+    const rk=bytesToMatrix(rks[round]);
     const p4=snap(s); s=s.map((col,c)=>col.map((b,r)=>b^rk[c][r]));
     steps.push({ name:`AddRoundKey (R${round})`, state: snap(s), prev: p4, formula:`S ⊕ K${round}`, desc:`XOR with round key ${round}. Folds key material into every byte of the state.` });
   }
@@ -84,9 +85,10 @@ export function decryptSteps(text, key) {
 
   steps.push({ name:"Cipher Input", state: snap(s), formula:"C → matrix", desc:"Ciphertext hex loaded into the 4×4 state matrix. All operations will run in reverse order." });
 
-  let rk = bytesToMatrix(rks[10]);
-  s = s.map((col,c)=>col.map((b,r)=>b^rk[c][r]));
-  steps.push({ name:"AddRoundKey (R10)", state: snap(s), formula:"C ⊕ K₁₀", desc:"XOR with round key 10 first — decryption uses round keys in reverse: 10 → 9 → … → 0." });
+  const rk10 = bytesToMatrix(rks[10]);
+  const p10 = snap(s);
+  s = s.map((col,c)=>col.map((b,r)=>b^rk10[c][r]));
+  steps.push({ name:"AddRoundKey (R10)", state: snap(s), prev: p10, formula:"C ⊕ K₁₀", desc:"XOR with round key 10 first — decryption uses round keys in reverse: 10 → 9 → … → 0." });
 
   for(let round=9;round>=0;round--){
     const p1=snap(s); s=invShiftRows(s);
@@ -95,7 +97,7 @@ export function decryptSteps(text, key) {
     const p2=snap(s); s=invSubBytes(s);
     steps.push({ name:`InvSubBytes (R${round})`, state: snap(s), prev: p2, formula:"Inverse S-Box", desc:"Each byte passed through the inverse S-Box, reversing the non-linear substitution." });
 
-    rk=bytesToMatrix(rks[round]);
+    const rk=bytesToMatrix(rks[round]);
     const p3=snap(s); s=s.map((col,c)=>col.map((b,r)=>b^rk[c][r]));
     steps.push({ name:`AddRoundKey (R${round})`, state: snap(s), prev: p3, formula:`S ⊕ K${round}`, desc:`XOR with round key ${round}. Since XOR is self-inverse, this undoes the encryption key mixing.` });
 

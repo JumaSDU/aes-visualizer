@@ -12,6 +12,8 @@ function getColor(name) {
   return OP_COLOR[name] || "#64748b";
 }
 
+export { getColor };
+
 export default function StepViewer({ step }) {
   const [animated, setAnimated] = useState([]);
 
@@ -88,15 +90,7 @@ export default function StepViewer({ step }) {
           </div>
         </div>
 
-        {step.desc && (
-          <p style={{
-            fontFamily: "monospace", fontSize: 11,
-            color: "#475569", lineHeight: 1.7, marginTop: 10, marginBottom: 0,
-          }}>
-            {step.desc}
-          </p>
-        )}
-        <p style={{ fontFamily: "monospace", fontSize: 11, color, marginTop: 5, marginBottom: 0, opacity: 0.8 }}>
+        <p style={{ fontFamily: "monospace", fontSize: 11, color, marginTop: 10, marginBottom: 0, opacity: 0.8, textAlign: "center" }}>
           OUT → {step.state.slice(0, 8).join(" ")} …
         </p>
       </div>
